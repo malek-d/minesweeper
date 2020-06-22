@@ -6,7 +6,7 @@ class Field:
         self.columns = columns
         self.rows = rows
         self.max_bombs = max_bombs
-        self.field = [ [ tile.Tile() for i in range(columns)] for n in range(rows) ]
+        self.field = [ [ tile.Tile() for y in range(self.columns)] for x in range(self.rows) ]
         self.gameOver = False
         self.addMines()
         self.addNumbers()
@@ -14,14 +14,15 @@ class Field:
     def addMines(self):
         for i in range(self.max_bombs):
             while True:
-                x = randint(0, self.columns - 1)
-                y = randint(0, self.rows - 1)
-                if self.field[y][x].bomb == False:
-                    self.field[y][x].bomb = True
+                x = randint(0, self.rows - 1)
+                y = randint(0, self.columns - 1)
+                if self.field[x][y].bomb == False:
+                    self.field[x][y].bomb = True
                     break
    
     def setFlag(self,x,y):
         self.field[y][x].isFlagged = not self.field[y][x].isFlagged
+        
     def printField(self):
         for row in self.field:
             row_string = "[ "
@@ -30,20 +31,17 @@ class Field:
             print("{0}]".format(row_string))
             
     def addNumbers(self):
-        for x in range(0, self.rows):
-            for y in range(0,self.columns):
+        for x in range(0, self.columns):
+            for y in range(0,self.rows):
                 bomb_adjacency = 0
                 for (dx, dy) in [ (0,1), (0,-1), (1,0), (-1,0), (1,1), (1,-1), (-1,1), (-1,-1) ]:
-                    try:
-                        if self.inBounds(x + dx, y+dy) and self.field[x+dx][y+dy].bomb:
-                            bomb_adjacency += 1
-                    except IndexError:
-                        continue
-                print("x:{0}/{1}; y{2}/{3}".format(x, self.columns - 1,y, self.rows - 1))
-                if self.field[x][y].bomb:
-                    self.field[x][y].label = "X"
+                    if self.inBounds(x + dx, y+dy) and self.field[y+dy][x+dx].bomb:
+                        bomb_adjacency += 1
+                print("x:{0}/{1}; y{2}/{3}".format(x, self.columns - 1, y , self.rows - 1))
+                if self.field[y][x].bomb:
+                    self.field[y][x].label = "X"
                 elif bomb_adjacency > 0:
-                    self.field[x][y].label = bomb_adjacency
+                    self.field[y][x].label = bomb_adjacency
                     
     def inBounds(self, x,y):
         return x >= 0 and x < self.columns and y >= 0 and y < self.rows
